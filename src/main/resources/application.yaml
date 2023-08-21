@@ -33,3 +33,6 @@ security:
     access: 30m
     refresh: 30d
 
+picture:
+    path: picture
+    endPoint: /image/

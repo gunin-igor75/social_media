@@ -1,7 +1,7 @@
 package com.github.guninigor75.social_media.controller;
 
-import com.github.guninigor75.social_media.domain.activity.Picture;
-import com.github.guninigor75.social_media.domain.exception.PictureNotFoundException;
+import com.github.guninigor75.social_media.entity.activity.Picture;
+import com.github.guninigor75.social_media.exception.PictureNotFoundException;
 import com.github.guninigor75.social_media.service.PictureService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class PictureController {
                     MediaType.IMAGE_GIF_VALUE,
                     MediaType.APPLICATION_OCTET_STREAM_VALUE
             })
-    public ResponseEntity<byte[]> downLoadImage(@PathVariable("id") Long id) {
+    public ResponseEntity<byte[]> downLoadImage(@PathVariable("id") Integer id) {
         Picture picture = pictureService.getPicture(id);
         Path path = Paths.get(picture.getFilePath());
         byte[] bytes = getBytes(path);

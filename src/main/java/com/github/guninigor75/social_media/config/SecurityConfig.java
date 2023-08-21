@@ -1,6 +1,6 @@
 package com.github.guninigor75.social_media.config;
 
-import com.github.guninigor75.social_media.web.security.SecurityUserDetailsService;
+import com.github.guninigor75.social_media.security.SecurityUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

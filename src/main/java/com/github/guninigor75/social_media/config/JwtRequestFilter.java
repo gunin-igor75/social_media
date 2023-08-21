@@ -1,11 +1,13 @@
 package com.github.guninigor75.social_media.config;
 
-import com.github.guninigor75.social_media.web.security.JwtTokenProvider;
+import com.github.guninigor75.social_media.security.JwtTokenProvider;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtRequestFilter extends OncePerRequestFilter {
@@ -26,18 +29,23 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
-        String jwtToken = null;
         String username = null;
+        String tokenJwt = null;
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwtToken = authHeader.substring(7);
-        }
-        if (jwtToken != null && jwtTokenProvider.validatedToken(jwtToken)) {
-            username = jwtTokenProvider.getUserName(jwtToken);
+            tokenJwt = authHeader.substring(7);
+            try {
+                username = jwtTokenProvider.getUsername(tokenJwt);
+            } catch (ExpiredJwtException ex) {
+                log.debug("Token lifetime expired ");
+            } catch (SecurityException ex) {
+                log.debug("Signature is wrong ");
+            }
         }
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                username,null, jwtTokenProvider.getRolesFromToken(jwtToken).stream()
-                    .map(SimpleGrantedAuthority::new).toList()
+                    username,
+                    null,
+                    jwtTokenProvider.getRolesFromToken(tokenJwt).stream().map(SimpleGrantedAuthority::new).toList()
             );
             SecurityContextHolder.getContext().setAuthentication(token);
         }

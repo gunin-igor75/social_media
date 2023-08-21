@@ -1,6 +1,6 @@
 package com.github.guninigor75.social_media.repository;
 
-import com.github.guninigor75.social_media.domain.user.Role;
+import com.github.guninigor75.social_media.entity.user.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
