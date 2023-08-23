@@ -1,15 +1,14 @@
 package com.github.guninigor75.social_media.controller;
 
 import com.github.guninigor75.social_media.dto.activity.CreatePost;
-import com.github.guninigor75.social_media.dto.activity.PagePostsDto;
+import com.github.guninigor75.social_media.dto.activity.PageDto;
 import com.github.guninigor75.social_media.dto.activity.PostDto;
 import com.github.guninigor75.social_media.dto.validation.OnCreate;
 import com.github.guninigor75.social_media.dto.validation.OnUpdate;
 import com.github.guninigor75.social_media.entity.activity.Post;
-import com.github.guninigor75.social_media.mappers.PostMapper;
+import com.github.guninigor75.social_media.mapper.PostMapper;
 import com.github.guninigor75.social_media.security.SecurityUser;
 import com.github.guninigor75.social_media.service.PostService;
-import com.github.guninigor75.social_media.util.FileManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -29,27 +28,23 @@ public class PostController {
 
     private final PostService postService;
 
-    private final FileManager fileManager;
-
     private final PostMapper postMapper;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public PostDto createPost(@RequestPart(name = "properties") @Validated(OnCreate.class) CreatePost createPost,
-                              @RequestPart(name = "image") MultipartFile file,
+                              @RequestPart(name = "image", required = false) MultipartFile file,
                               @AuthenticationPrincipal SecurityUser securityUser) {
-        fileManager.checkFile(file);
         Post post = postMapper.createPostToPost(createPost);
         Post persistentPost = postService.createPost(post, file, securityUser);
         return postMapper.postToPostDto(persistentPost);
     }
 
-    @PatchMapping(path = "{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(path = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("@customSecurityExpression.canAccessPost(#id)")
     public PostDto updatePicturePost(@PathVariable Long id,
                                      @RequestPart(name = "image") MultipartFile file) {
-        fileManager.checkFile(file);
         Post post = postService.updatePictureByPostId(id, file);
         return postMapper.postToPostDto(post);
     }
@@ -62,25 +57,34 @@ public class PostController {
         return postMapper.postToPostDto(post);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("@customSecurityExpression.canAccessPost(#id)")
-    public void deleteAds(@PathVariable Long id) {
+    public void deletePost(@PathVariable Long id) {
         postService.deletePost(id);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public PostDto getPost(@PathVariable("id") Long id) {
-        Post post = postService.getPost(id);
+        Post post = postService.getPostById(id);
         return postMapper.postToPostDto(post);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<PostDto> getPosts(PagePostsDto pagePostsDto) {
-        Pageable pageable = new PagePostsDto().getPageable(pagePostsDto);
+    public List<PostDto> getPosts(PageDto pageDto) {
+        Pageable pageable = new PageDto().getPageable(pageDto);
         List<Post> posts = postService.getPosts(pageable);
+        return postMapper.postsToPostsDto(posts);
+    }
+
+    @GetMapping("/friends")
+    @ResponseStatus(HttpStatus.OK)
+    public List<PostDto> getPostsFriend(PageDto pageDto,
+                                        @AuthenticationPrincipal SecurityUser securityUser) {
+        Pageable pageable = new PageDto().getPageable(pageDto);
+        List<Post> posts = postService.getPostsByFriend(securityUser, pageable);
         return postMapper.postsToPostsDto(posts);
     }
 }

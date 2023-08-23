@@ -4,13 +4,12 @@ import com.github.guninigor75.social_media.dto.activity.CreatePost;
 import com.github.guninigor75.social_media.entity.activity.Picture;
 import com.github.guninigor75.social_media.entity.activity.Post;
 import com.github.guninigor75.social_media.entity.user.User;
-import com.github.guninigor75.social_media.exception.ResourceNotFoundException;
+import com.github.guninigor75.social_media.exception_handler.ResourceNotFoundException;
 import com.github.guninigor75.social_media.repository.PostRepository;
 import com.github.guninigor75.social_media.security.SecurityUser;
 import com.github.guninigor75.social_media.service.PictureService;
 import com.github.guninigor75.social_media.service.PostService;
 import com.github.guninigor75.social_media.service.UserService;
-import com.github.guninigor75.social_media.service.props.PictureProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -33,30 +32,30 @@ public class PostServiceImp implements PostService {
 
     private final PictureService pictureService;
 
-    private final PictureProperties pictureProperties;
-
     @Override
     public Post createPost(Post post, MultipartFile file, SecurityUser securityUser) {
         User user = userService.getProxyUser(securityUser.getId());
+        post.setUser(user);
+        if (file == null) {
+            return postRepository.save(post);
+        }
         Picture picture = new Picture();
         picture.setPost(post);
         Picture persistentPicture = pictureService.createPicture(picture, file);
-        post.setUser(user);
-        post.setImage(pictureProperties.getEndPoint() + persistentPicture.getFilePath());
-        return postRepository.save(post);
+        return persistentPicture.getPost();
     }
 
     @Override
     @Transactional
     public void deletePost(Long id) {
-        Post post = getPost(id);
+        Post post = getPostById(id);
         Picture picture = pictureService.getPictureByIdPost(id);
         pictureService.deletePicture(picture);
         postRepository.delete(post);
     }
 
     @Override
-    public Post getPost(Long id) {
+    public Post getPostById(Long id) {
         Optional<Post> postOrEmpty = postRepository.findById(id);
         if (postOrEmpty.isEmpty()) {
             String message = "Post with " + id + " is not in the database";
@@ -69,14 +68,22 @@ public class PostServiceImp implements PostService {
     @Override
     public Post updatePictureByPostId(Long id, MultipartFile file) {
         Picture picture = pictureService.getPictureByIdPost(id);
-        pictureService.updatePicture(picture, file);
-        return getPost(id);
+        Picture persistentPicture;
+        if (picture != null) {
+            persistentPicture = pictureService.updatePicture(picture, file);
+        } else {
+            Post post = getPostById(id);
+            picture = new Picture();
+            picture.setPost(post);
+            persistentPicture = pictureService.createPicture(picture, file);
+        }
+        return persistentPicture.getPost();
     }
 
     @Override
     @Transactional
     public Post updatePost(CreatePost createPost) {
-        Post post = getPost(createPost.getId());
+        Post post = getPostById(createPost.getId());
         if (createPost.getTitle() != null) {
             post.setTitle(createPost.getTitle());
         }
@@ -91,5 +98,16 @@ public class PostServiceImp implements PostService {
     public List<Post> getPosts(Pageable pageable) {
         Page<Post> all = postRepository.findAll(pageable);
         return all.getContent();
+    }
+
+    @Override
+    public List<Post> getPostsByFriend(SecurityUser securityUser, Pageable pageable) {
+        Page<Post> all = postRepository.findByFriend(securityUser.getId(), pageable);
+        return all.getContent();
+    }
+
+    @Override
+    public boolean isOwnerPost(Long postId, Long userId) {
+        return postRepository.existsByIdAndUser_Id(postId, userId);
     }
 }

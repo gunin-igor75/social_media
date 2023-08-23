@@ -11,5 +11,4 @@ public class PictureProperties {
 
     private String path;
 
-    private String endPoint;
 }

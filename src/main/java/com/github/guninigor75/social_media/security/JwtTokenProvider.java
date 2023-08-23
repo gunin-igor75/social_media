@@ -73,8 +73,7 @@ public class JwtTokenProvider {
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
-                .get("username")
-                .toString();
+                .getSubject();
     }
 
     public List<String> getRolesFromToken(String token) {

@@ -11,6 +11,6 @@ public class MessageDto {
 
     private String content;
 
-    private LocalDateTime createdAt;
+    private Long createdAt;
 
 }

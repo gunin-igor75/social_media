@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Data
-public class PagePostsDto {
+public class PageDto {
 
     private Integer pageNo = 0;
 
@@ -19,13 +19,13 @@ public class PagePostsDto {
 
     private String sortByColumn = "createdAt";
 
-    public Pageable getPageable(PagePostsDto dto) {
-        List<String> columns = List.of("id", "title", "content", "createdAt", "updatedAt");
+    private List<String> columns;
+
+    public Pageable getPageable(PageDto dto) {
         Integer page = Objects.nonNull(dto.getPageNo()) && dto.pageNo >= 0 ? dto.getPageNo() : this.pageNo;
         Integer size = Objects.nonNull(dto.getPageSize()) && dto.pageSize >= 0 ? dto.getPageSize() : this.pageSize;
         Sort.Direction sort = Objects.nonNull(dto.getSort()) ? dto.getSort() : this.sort;
-        String column = Objects.nonNull(dto.getSortByColumn()) && columns.contains(dto.sortByColumn)
-                ? dto.getSortByColumn() : this.sortByColumn;
+        String column = Objects.nonNull(dto.getSortByColumn())? dto.getSortByColumn() : this.sortByColumn;
         return PageRequest.of(page, size, sort, column);
     }
 }

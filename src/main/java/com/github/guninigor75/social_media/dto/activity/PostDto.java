@@ -15,8 +15,8 @@ public class PostDto {
 
     private String image;
 
-    private Instant createdAt;
+    private Long createdAt;
 
-    private Instant updatedAt;
+    private Long updatedAt;
 
 }

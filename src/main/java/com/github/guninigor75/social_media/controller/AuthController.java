@@ -7,7 +7,7 @@ import com.github.guninigor75.social_media.dto.auth.JwtRequest;
 import com.github.guninigor75.social_media.dto.auth.JwtResponse;
 import com.github.guninigor75.social_media.dto.user.UserDto;
 import com.github.guninigor75.social_media.dto.validation.OnCreate;
-import com.github.guninigor75.social_media.mappers.UserMapper;
+import com.github.guninigor75.social_media.mapper.UserMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,14 +27,15 @@ public class AuthController {
 
     @PostMapping("/login")
     @ResponseStatus(HttpStatus.OK)
-    public JwtResponse login(@Valid @RequestBody JwtRequest jwtRequest) {
+    public JwtResponse login(@RequestBody @Valid JwtRequest jwtRequest) {
         return authService.login(jwtRequest);
     }
 
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto register(@Validated(OnCreate.class) UserDto userDto) {
+    public UserDto register(@RequestBody @Validated(OnCreate.class)
+                            UserDto userDto) {
         User user = userMapper.userDtoToUser(userDto);
         User persistentUser = userService.createUser(user);
         return userMapper.userToUserDto(persistentUser);

@@ -1,4 +1,4 @@
-package com.github.guninigor75.social_media.mappers;
+package com.github.guninigor75.social_media.mapper;
 
 import com.github.guninigor75.social_media.entity.user.User;
 import com.github.guninigor75.social_media.dto.user.UserDto;

@@ -1,4 +1,4 @@
-package com.github.guninigor75.social_media.exception;
+package com.github.guninigor75.social_media.exception_handler;
 
 /**
  * Класс исключения - отсутствие сущности в вбд по id

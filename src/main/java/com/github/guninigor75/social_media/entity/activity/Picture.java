@@ -8,9 +8,6 @@ import lombok.Setter;
 
 import java.util.Objects;
 
-/**
- * Фото родительский класс для Avatar и Picture
- */
 
 @Getter
 @Setter
@@ -20,25 +17,21 @@ import java.util.Objects;
 @Table(name = "pictures")
 public class Picture {
 
-    /** Идентификатор */
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    /** Путь к файлу */
     @Column(nullable = false)
     private String filePath;
 
-    /** mediaType файла*/
     @Column(nullable = false)
     private String mediaType;
 
-    /*** Размер файла */
     @Column(nullable = false)
     private long fileSize;
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
+    @JoinColumn(name = "id")
     private Post post;
 
 
