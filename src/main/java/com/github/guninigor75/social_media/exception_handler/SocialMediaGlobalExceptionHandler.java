@@ -2,7 +2,6 @@ package com.github.guninigor75.social_media.exception_handler;
 
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,25 +20,25 @@ public class SocialMediaGlobalExceptionHandler {
 
     @ExceptionHandler
     @ResponseStatus(BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handleAnotherError(MethodArgumentNotValidException ex) {
+    public ErrorResponse handleAnotherError(MethodArgumentNotValidException ex) {
         List<FieldError> fieldErrors = ex.getFieldErrors();
         String message = fieldErrors.stream()
                 .map(field -> field.getObjectName() + "." + field.getField() + ":" + field.getDefaultMessage())
                 .collect(Collectors.joining(",", "[", "]"));
-        return new ResponseEntity<>(new ErrorResponse(message), BAD_REQUEST);
+        return new  ErrorResponse(message);
     }
 
     @ExceptionHandler({ConstraintViolationException.class,
             ImageUploadException.class})
     @ResponseStatus(BAD_REQUEST)
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
-        return new ResponseEntity<>(new ErrorResponse(ex.getMessage()), BAD_REQUEST);
+    public ErrorResponse handleConstraintViolationException(ConstraintViolationException ex) {
+        return new ErrorResponse(ex.getMessage());
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(NOT_FOUND)
-    public ResponseEntity<ErrorResponse> handleResourceNotFoundException(ResourceNotFoundException ex) {
-        return new ResponseEntity<>(new ErrorResponse(ex.getMessage()), NOT_FOUND);
+    public ErrorResponse handleResourceNotFoundException(ResourceNotFoundException ex) {
+        return new ErrorResponse(ex.getMessage());
     }
 
     @ExceptionHandler({AccessDeniedException.class,
