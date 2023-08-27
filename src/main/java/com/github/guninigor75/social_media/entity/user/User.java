@@ -8,9 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -22,16 +20,12 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
 
-    @Column(name = "name")
     private String name;
 
-    @Column(name = "username")
     private String username;
 
-    @Column(name = "password")
     private String password;
 
     @ManyToMany(
@@ -47,14 +41,31 @@ public class User {
     )
     private Collection<Role> roles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Friend> friends;
+    @ManyToMany(fetch = FetchType.LAZY, cascade=CascadeType.ALL)
+    private Set<User> friends = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Post> posts;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Invite> invites = new HashSet<>();
+
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Message> messages;
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
     public void addRole(Role role) {
         this.roles.add(role);
@@ -65,4 +76,23 @@ public class User {
         this.roles.remove(role);
         role.getUsers().remove(this);
     }
+
+    public void addFriend(User friend) {
+        this.friends.add(friend);
+    }
+
+    public void removeFriend(User friend) {
+        this.friends.remove(friend);
+    }
+
+    public void addInvite(Invite invite) {
+        invite.setUser(this);
+        this.invites.add(invite);
+    }
+
+    public void removeInvite(Invite invite) {
+        this.invites.remove(invite);
+        invite.setUser(null);
+    }
+
 }

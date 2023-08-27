@@ -1,4 +1,4 @@
-package com.github.guninigor75.social_media.config;
+package com.github.guninigor75.social_media.security;
 
 import com.github.guninigor75.social_media.security.JwtTokenProvider;
 import io.jsonwebtoken.ExpiredJwtException;

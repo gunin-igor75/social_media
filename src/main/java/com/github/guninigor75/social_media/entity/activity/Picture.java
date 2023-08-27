@@ -20,13 +20,10 @@ public class Picture {
     @Id
     private Long id;
 
-    @Column(nullable = false)
     private String filePath;
 
-    @Column(nullable = false)
     private String mediaType;
 
-    @Column(nullable = false)
     private long fileSize;
 
     @OneToOne(fetch = FetchType.LAZY)

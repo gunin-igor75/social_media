@@ -16,7 +16,7 @@
 
     <include file="v-1.0/db.changelog-v.1.0.xml" relativeToChangelogFile="true"/>
 
-    <changeSet id="9" author="gil">
+    <changeSet id="10" author="gil">
         <tagDatabase tag="v.1.0"/>
     </changeSet>
 

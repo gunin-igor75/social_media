@@ -34,7 +34,7 @@ public class PostServiceImp implements PostService {
 
     @Override
     public Post createPost(Post post, MultipartFile file, SecurityUser securityUser) {
-        User user = userService.getProxyUser(securityUser.getId());
+        User user = userService.getLinkUser(securityUser.getId());
         post.setUser(user);
         if (file == null) {
             return postRepository.save(post);
@@ -49,35 +49,27 @@ public class PostServiceImp implements PostService {
     @Transactional
     public void deletePost(Long id) {
         Post post = getPostById(id);
-        Picture picture = pictureService.getPictureByIdPost(id);
-        pictureService.deletePicture(picture);
+        Optional<Picture> picture = pictureService.getPictureByIdPost(id);
+        picture.ifPresent(pictureService::deletePicture);
         postRepository.delete(post);
     }
 
-    @Override
-    public Post getPostById(Long id) {
-        Optional<Post> postOrEmpty = postRepository.findById(id);
-        if (postOrEmpty.isEmpty()) {
-            String message = "Post with " + id + " is not in the database";
-            log.debug(message);
-            throw new ResourceNotFoundException(message);
-        }
-        return postOrEmpty.get();
-    }
 
     @Override
+    @Transactional
     public Post updatePictureByPostId(Long id, MultipartFile file) {
-        Picture picture = pictureService.getPictureByIdPost(id);
-        Picture persistentPicture;
-        if (picture != null) {
-            persistentPicture = pictureService.updatePicture(picture, file);
+        Optional<Picture> pictureOrEmpty = pictureService.getPictureByIdPost(id);
+        Picture picture;
+        if (pictureOrEmpty.isPresent()) {
+            picture = pictureOrEmpty.get();
+            picture = pictureService.updatePicture(picture, file);
         } else {
             Post post = getPostById(id);
             picture = new Picture();
             picture.setPost(post);
-            persistentPicture = pictureService.createPicture(picture, file);
+            picture = pictureService.createPicture(picture, file);
         }
-        return persistentPicture.getPost();
+        return picture.getPost();
     }
 
     @Override
@@ -102,12 +94,23 @@ public class PostServiceImp implements PostService {
 
     @Override
     public List<Post> getPostsByFriend(SecurityUser securityUser, Pageable pageable) {
-        Page<Post> all = postRepository.findByFriend(securityUser.getId(), pageable);
+        Page<Post> all = postRepository.findByUser_Friends_Id(securityUser.getId(), pageable);
         return all.getContent();
     }
 
     @Override
     public boolean isOwnerPost(Long postId, Long userId) {
         return postRepository.existsByIdAndUser_Id(postId, userId);
+    }
+
+    @Override
+    public Post getPostById(Long id) {
+        Optional<Post> postOrEmpty = postRepository.findById(id);
+        if (postOrEmpty.isEmpty()) {
+            String message = "Post with " + id + " is not in the database";
+            log.debug(message);
+            throw new ResourceNotFoundException(message);
+        }
+        return postOrEmpty.get();
     }
 }

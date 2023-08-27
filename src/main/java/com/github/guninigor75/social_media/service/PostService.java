@@ -13,8 +13,6 @@ public interface PostService {
 
     void deletePost(Long id);
 
-    Post getPostById(Long id);
-
     Post updatePictureByPostId(Long id, MultipartFile file);
 
     Post updatePost(CreatePost createPost);
@@ -24,4 +22,6 @@ public interface PostService {
     List<Post> getPostsByFriend(SecurityUser securityUser, Pageable pageable);
 
     boolean isOwnerPost(Long postId, Long id);
+
+    Post getPostById(Long id);
 }

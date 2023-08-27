@@ -5,20 +5,20 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
 
-    <changeSet id="5" author="gil">
+    <changeSet id="9" author="gil">
         <sqlFile dbms="postgresql"
                  encoding="utf8"
                  endDelimiter="\nGO"
                  splitStatements="true"
                  stripComments="true"
-                 path="db/changelog/v-1.0/30-create-friends-table.sql"/>
+                 path="db/changelog/v-1.0/70-create-invites-table.sql"/>
         <rollback>
             <sqlFile dbms="postgresql"
                      encoding="utf8"
                      endDelimiter="\nGO"
                      splitStatements="true"
                      stripComments="true"
-                     path="db/changelog/v-1.0/30-drop-friends-table.sql"/>
+                     path="db/changelog/v-1.0/70-drop-invites-table.sql"/>
         </rollback>
     </changeSet>
 

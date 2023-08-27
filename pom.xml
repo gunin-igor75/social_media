@@ -20,6 +20,8 @@
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<webmvc-ui.version>2.2.0</webmvc-ui.version>
 		<jjwt.version>0.11.5</jjwt.version>
+		<testcontainers.postgres.version>1.19.0</testcontainers.postgres.version>
+		<testcontainers.junit.version>1.19.0</testcontainers.junit.version>
 	</properties>
 
 	<dependencies>
@@ -112,7 +114,21 @@
 			<scope>test</scope>
 		</dependency>
 
-	</dependencies>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${testcontainers.junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>${testcontainers.postgres.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+    </dependencies>
 
 	<build>
 		<plugins>

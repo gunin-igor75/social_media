@@ -1,7 +1,6 @@
 package com.github.guninigor75.social_media.service.imp;
 
 import com.github.guninigor75.social_media.entity.activity.Picture;
-import com.github.guninigor75.social_media.exception_handler.ResourceNotFoundException;
 import com.github.guninigor75.social_media.repository.PictureRepository;
 import com.github.guninigor75.social_media.service.FileManagerService;
 import com.github.guninigor75.social_media.service.PictureService;
@@ -10,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -42,14 +43,11 @@ public class PictureServiceImp implements PictureService {
     }
 
     @Override
-    public Picture getPictureByIdPost(Long id) {
-        return pictureRepository.findByPost_id(id).orElseThrow(() -> {
-                    String message = "Picture with id post " + id + " is not in the database";
-                    log.error(message);
-                    return new ResourceNotFoundException(message);
-                }
-        );
+    public Optional<Picture> getPictureByIdPost(Long id) {
+        return pictureRepository.findByPost_id(id);
     }
+
+
 
     private Picture savePicture(Picture picture, MultipartFile file, String filePath) {
         picture.setFilePath(filePath);

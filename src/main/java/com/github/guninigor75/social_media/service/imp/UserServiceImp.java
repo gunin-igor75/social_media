@@ -1,24 +1,19 @@
 package com.github.guninigor75.social_media.service.imp;
 
-import com.github.guninigor75.social_media.entity.activity.Message;
-import com.github.guninigor75.social_media.entity.user.Friend;
-import com.github.guninigor75.social_media.exception_handler.ResourceNotFoundException;
+import com.github.guninigor75.social_media.entity.user.Invite;
 import com.github.guninigor75.social_media.entity.user.Role;
 import com.github.guninigor75.social_media.entity.user.User;
+import com.github.guninigor75.social_media.exception_handler.ResourceNotFoundException;
 import com.github.guninigor75.social_media.repository.UserRepository;
-import com.github.guninigor75.social_media.security.SecurityUser;
-import com.github.guninigor75.social_media.service.FriendService;
-import com.github.guninigor75.social_media.service.MessageService;
+import com.github.guninigor75.social_media.service.InviteService;
 import com.github.guninigor75.social_media.service.RoleService;
 import com.github.guninigor75.social_media.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -29,11 +24,9 @@ public class UserServiceImp implements UserService {
 
     private final UserRepository userRepository;
 
-    private final FriendService friendService;
-
-    private final MessageService messageService;
-
     private final RoleService roleService;
+
+    private final InviteService inviteService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -73,67 +66,87 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public User getProxyUser(Long id) {
+    public User getLinkUser(Long id) {
         return userRepository.getReferenceById(id);
     }
 
     @Override
     @Transactional
-    public void createFriendship(SecurityUser securityUser, Long friendId) {
-        checkingCandidate(securityUser.getId(), friendId);
-        User ownerRequest = getProxyUser(securityUser.getId());
-        User target = getUserById(friendId);
-        Friend  friend = new Friend();
-        friend.setUser(ownerRequest);
-        friend.setFriend(target);
-        friendService.createFriend(friend);
+    public void createRequestFriendship(Long userId, Long targetId) {
+        checkingCandidateForFriendship(userId, targetId);
+        Optional<Invite> inviteOrEmpty = inviteService.getInvite(userId, targetId);
+        if (inviteOrEmpty.isEmpty()) {
+            createSubscription(userId, targetId);
+        } else {
+            Invite invite = inviteOrEmpty.get();
+            if (invite.getStatus() == Invite.Status.ACCEPTED) {
+                String message = "You are already friends";
+                log.debug(message);
+                throw new IllegalStateException(message);
+            } else {
+                if (invite.getCandidate().equals(userId)) {
+                    acceptedSubscription(userId, targetId, invite);
+                }
+            }
+        }
     }
 
     @Override
     @Transactional
-    public void deleteFriend(SecurityUser securityUser, Long friendId) {
-        checkingCandidate(securityUser.getId(), friendId);
-        friendService.deleteFriend(securityUser.getId(), friendId);
+    public void acceptedFriendShip(Long userId, Long friendId) {
+        checkingCandidateForFriendship(userId, friendId);
+        Optional<Invite> inviteOrEmpty = inviteService.getInvite(userId, friendId);
+        if (inviteOrEmpty.isPresent()) {
+            acceptedSubscription(userId, friendId, inviteOrEmpty.get());
+        } else {
+            String message = "Subscription request missing";
+            log.debug(message);
+            throw new IllegalStateException(message);
+        }
     }
 
     @Override
     @Transactional
-    public Message createMessage(SecurityUser securityUser, Long friendId, Message message) {
-        Long userId = securityUser.getId();
-        checkingIsFriend(userId, friendId);
-        User sender = getProxyUser(userId);
-        User recipient = getUserById(friendId);
-        message.setSender(sender);
-        message.setRecipient(recipient);
-        return messageService.createMessage(message);
+    public void rejectedFriendShip(Long userId, Long applicant) {
+        checkingCandidateForFriendship(userId, applicant);
+        inviteService.deleteInvite(userId, applicant);
     }
 
     @Override
-    public List<Message> getMessages(SecurityUser securityUser, Pageable pageable) {
-        Long senderId = securityUser.getId();
-        return messageService.getMessages(senderId, pageable);
+    @Transactional
+    public void deleteFriend(Long userId, Long friendId) {
+        checkingCandidateForFriendship(userId, friendId);
+        inviteService.deleteInvite(userId, friendId);
+        User ownerRequest = getUserById(userId);
+        User target = getLinkUser(friendId);
+        ownerRequest.removeFriend(target);
+        userRepository.save(ownerRequest);
     }
 
-    @Override
-    public List<Message> getMessagesUser(SecurityUser securityUser, Long recipientId, Pageable pageable) {
-        Long senderId = securityUser.getId();
-        return messageService.getMessagesUser(senderId, recipientId, pageable);
-    }
-
-    private void checkingCandidate(Long userId, Long friendId) {
+    private void checkingCandidateForFriendship(Long userId, Long friendId) {
         if (Objects.equals(userId, friendId)) {
-            String message = String.format("UserId %d == FriendId %d  unacceptable",userId, friendId);
+            String message = "Unacceptable";
             log.debug(message);
             throw new IllegalStateException(message);
         }
+    }
+    private void acceptedSubscription(Long userId, Long friendId, Invite invite) {
+        invite.setStatus(Invite.Status.ACCEPTED);
+        User ownerRequest = getUserById(userId);
+        User target = getLinkUser(friendId);
+        ownerRequest.addFriend(target);
+        userRepository.save(ownerRequest);
     }
 
-    private void checkingIsFriend(Long userId, Long friendId) {
-        boolean check = friendService.isFriend(userId, friendId);
-        if (!check) {
-            String message = String.format("Пользователь с id %d не является другом", friendId);
-            log.debug(message);
-            throw new IllegalStateException(message);
-        }
+    private void createSubscription(Long userId, Long friendId) {
+        User ownerRequest = getUserById(userId);
+        User target = getLinkUser(friendId);
+        Invite invite = new Invite();
+        invite.setCandidate(friendId);
+        invite.setStatus(Invite.Status.CONSIDERATION);
+        ownerRequest.addFriend(target);
+        ownerRequest.addInvite(invite);
+        userRepository.save(ownerRequest);
     }
+
 }

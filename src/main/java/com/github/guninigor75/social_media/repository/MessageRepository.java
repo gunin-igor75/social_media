@@ -13,6 +13,7 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     Page<Message> findBySenderId(Long id, Pageable pageable);
 
-    Page<Message> findBySenderIdAndRecipientId(Long senderId, Long recipientId, Pageable pageable);
+    @Query("select m from Message m where m.sender.id = ?1 and m.recipient = ?2")
+    Page<Message> findBySender_IdAndRecipient(Long id, Long recipient, Pageable pageable);
 
 }

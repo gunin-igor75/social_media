@@ -1,13 +1,8 @@
 package com.github.guninigor75.social_media.service;
 
-import com.github.guninigor75.social_media.entity.activity.Message;
 import com.github.guninigor75.social_media.entity.user.User;
-import com.github.guninigor75.social_media.security.SecurityUser;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 public interface UserService {
@@ -18,18 +13,15 @@ public interface UserService {
 
     User createUser(User user);
 
-    User getProxyUser(Long id);
+    User getLinkUser(Long id);
 
-    @Transactional
-    void createFriendship(SecurityUser securityUser, Long friendId);
 
-    void deleteFriend(SecurityUser securityUser, Long friendId);
+    void createRequestFriendship(Long userId, Long friendId);
 
-    @Transactional
-    Message createMessage(SecurityUser securityUser, Long friendId, Message message);
+    void acceptedFriendShip(Long userId, Long candidate);
 
-    List<Message> getMessages(SecurityUser securityUser, Pageable pageable);
 
-    List<Message> getMessagesUser(SecurityUser securityUser, Long friendId, Pageable pageable);
+    void deleteFriend(Long userId, Long friendId);
 
+    void rejectedFriendShip(Long userId, Long candidate);
 }

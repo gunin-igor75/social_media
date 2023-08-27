@@ -11,4 +11,8 @@ public class PictureProperties {
 
     private String path;
 
+
+    public PictureProperties(String path) {
+        this.path = path;
+    }
 }

@@ -76,25 +76,6 @@ public class JwtTokenProvider {
                 .getSubject();
     }
 
-    public List<String> getRolesFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("roles", List.class);
-    }
-
-    private String getUserId(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("id")
-                .toString();
-    }
-
     private List<String> getRolesFromUser(Collection<Role> roles) {
         return roles.stream()
                 .map(Role::getName)
