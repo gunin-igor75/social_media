@@ -9,6 +9,7 @@ import com.github.guninigor75.social_media.entity.activity.Post;
 import com.github.guninigor75.social_media.mapper.PostMapper;
 import com.github.guninigor75.social_media.security.SecurityUser;
 import com.github.guninigor75.social_media.service.PostService;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/posts")
 @RequiredArgsConstructor
+@Validated
 public class PostController {
 
     private final PostService postService;
@@ -43,7 +45,7 @@ public class PostController {
     @PatchMapping(path = "/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("@customSecurityExpression.canAccessPost(#id)")
-    public PostDto updatePicturePost(@PathVariable Long id,
+    public PostDto updatePicturePost(@PathVariable @PositiveOrZero Long id,
                                      @RequestPart(name = "image") MultipartFile file) {
         Post post = postService.updatePictureByPostId(id, file);
         return postMapper.postToPostDto(post);

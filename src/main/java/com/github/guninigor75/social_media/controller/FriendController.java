@@ -2,15 +2,18 @@ package com.github.guninigor75.social_media.controller;
 
 import com.github.guninigor75.social_media.security.SecurityUser;
 import com.github.guninigor75.social_media.service.UserService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/friends")
 @RequiredArgsConstructor
+@Validated
 public class FriendController {
 
     private final UserService userService;

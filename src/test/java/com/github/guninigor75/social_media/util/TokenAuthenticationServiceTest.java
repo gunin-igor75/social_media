@@ -1,7 +1,7 @@
 package com.github.guninigor75.social_media.util;
 
 import com.github.guninigor75.social_media.config.SecurityConfig;
-import com.github.guninigor75.social_media.config.SocialMediaConfiguration;
+import com.github.guninigor75.social_media.config.ControllerConfiguration;
 import com.github.guninigor75.social_media.controller.FriendController;
 import com.github.guninigor75.social_media.entity.user.Role;
 import com.github.guninigor75.social_media.entity.user.User;
@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @WebMvcTest(FriendController.class)
-@Import({SecurityConfig.class, SocialMediaConfiguration.class})
+@Import({SecurityConfig.class, ControllerConfiguration.class})
 public class TokenAuthenticationServiceTest {
 
     @Autowired
@@ -49,7 +49,9 @@ public class TokenAuthenticationServiceTest {
 //        String token = TokenAuthenticationService.createToken("john");
 
 //        assertNotNull(token);
-        mvc.perform(get("/test").header("Authorization", TOKEN_PREFIX + " " + token)).andExpect(status().isOk());
+        mvc.perform(get("/test")
+                .header("Authorization", TOKEN_PREFIX + " " + token))
+                .andExpect(status().isOk());
     }
 
     public static User getUser() {

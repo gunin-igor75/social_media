@@ -13,20 +13,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/messages")
+@RequestMapping("/api/v1/messages")
 @RequiredArgsConstructor
+@Validated
 public class MessageController {
 
     private final MessageService messageService;
 
     private final MessageMapper messageMapper;
 
-    @PostMapping("/messages/{id}")
+    @PostMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     public MessageDto createMessage(@RequestBody @Valid CreateMessage createMessage,
                                     @PathVariable("id") @PositiveOrZero Long friendId,
@@ -36,7 +38,7 @@ public class MessageController {
         return messageMapper.messageToMessageDto(persistentMessage);
     }
 
-    @GetMapping("/messages")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<MessageDto> getMessages(PageDto pageDto,
                                         @AuthenticationPrincipal SecurityUser securityUser) {
@@ -45,7 +47,7 @@ public class MessageController {
         return messageMapper.messagesToMessagesDto(messages);
     }
 
-    @GetMapping("/messages/{id}")
+    @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public List<MessageDto> getMessagesUser(PageDto pageDto,
                                             @PathVariable("id") @PositiveOrZero Long recipientId,

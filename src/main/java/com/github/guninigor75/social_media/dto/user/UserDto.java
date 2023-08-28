@@ -16,13 +16,15 @@ public class UserDto {
     private Long id;
 
     @NotBlank(message = "Name must be not empty", groups = OnCreate.class)
-    @Size(min = 3, max = 255, message = "Length name must be 3 - 255 symbol")
+    @Size(min = 3, max = 20, message = "Length name must be 3 - 255 symbol", groups = OnCreate.class)
     private String name;
 
+    @NotBlank(message = "Email must be not empty", groups = OnCreate.class)
     @Email(message = "Email does not match the given form", groups = OnCreate.class)
     private String username;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Size(min = 3, max = 20, message = "Length password must be 3 - 255 symbol", groups = OnCreate.class)
     @NotBlank(message = "Password must be not empty", groups = OnCreate.class)
     private String password;
 }

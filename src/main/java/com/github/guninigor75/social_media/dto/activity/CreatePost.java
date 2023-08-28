@@ -14,10 +14,10 @@ public class CreatePost {
     private Long id;
 
     @NotBlank(message = "Title must be not empty", groups = OnCreate.class)
-    @Size(min = 3, max = 50, message = "Length name must be 3 - 255 symbol")
+    @Size(min = 3, max = 50, message = "Length name must be 3 - 50 symbol", groups = OnCreate.class)
     private String title;
 
     @NotBlank(message = "Content must be not empty",  groups = OnCreate.class)
-    @Size(min = 3, max = 255, message = "Length name must be 3 - 255 symbol")
+    @Size(min = 3, max = 255, message = "Length name must be 3 - 255 symbol", groups = OnCreate.class)
     private String content;
 }

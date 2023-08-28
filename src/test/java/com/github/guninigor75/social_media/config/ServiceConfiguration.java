@@ -1,6 +1,7 @@
 package com.github.guninigor75.social_media.config;
 
 
+import com.github.guninigor75.social_media.mapper.UserMapper;
 import com.github.guninigor75.social_media.repository.*;
 import com.github.guninigor75.social_media.security.JwtTokenProvider;
 import com.github.guninigor75.social_media.service.*;
@@ -8,6 +9,7 @@ import com.github.guninigor75.social_media.service.imp.*;
 import com.github.guninigor75.social_media.service.props.JwtProperties;
 import com.github.guninigor75.social_media.service.props.PictureProperties;
 import lombok.RequiredArgsConstructor;
+import org.mapstruct.factory.Mappers;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -98,4 +100,6 @@ public class ServiceConfiguration {
     public PostService postServiceTest() {
         return new PostServiceImp(postRepository,userServiceTest(),pictureServiceTest());
     }
+
+
 }

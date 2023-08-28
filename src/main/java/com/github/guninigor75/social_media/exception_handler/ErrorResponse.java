@@ -1,12 +1,13 @@
 package com.github.guninigor75.social_media.exception_handler;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
 import lombok.Getter;
 
 /**
  * Обертка с удобной формы восприятия исключения на фронте
  */
-@Getter
+@Data
 @Schema(description = "Обертка для ошибок")
 public class ErrorResponse {
 
