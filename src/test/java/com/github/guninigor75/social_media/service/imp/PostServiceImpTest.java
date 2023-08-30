@@ -3,10 +3,11 @@ package com.github.guninigor75.social_media.service.imp;
 import com.github.guninigor75.social_media.config.IntegrationSuite;
 import com.github.guninigor75.social_media.config.ServiceConfiguration;
 import com.github.guninigor75.social_media.dto.activity.CreatePost;
-import com.github.guninigor75.social_media.dto.activity.PageDto;
+import com.github.guninigor75.social_media.dto.activity.PageDtoPost;
 import com.github.guninigor75.social_media.entity.activity.Post;
 import com.github.guninigor75.social_media.entity.user.User;
 import com.github.guninigor75.social_media.exception_handler.ResourceNotFoundException;
+import com.github.guninigor75.social_media.mapper.PostMapper;
 import com.github.guninigor75.social_media.repository.PictureRepository;
 import com.github.guninigor75.social_media.repository.PostRepository;
 import com.github.guninigor75.social_media.repository.UserRepository;
@@ -55,6 +56,9 @@ class PostServiceImpTest extends IntegrationSuite {
 
     @Autowired
     private FileManagerService fileManagerService;
+
+    @Autowired
+    private PostMapper postMapper;
 
     @BeforeEach
     public void init() {
@@ -208,7 +212,7 @@ class PostServiceImpTest extends IntegrationSuite {
 
         CreatePost createPost = givenCreatePost(postId);
 
-        Post newPost = postService.updatePost(createPost);
+        Post newPost = postService.updatePost(postMapper.createPostToPost(createPost));
 
         assertThat(oldPost.getId()).isEqualTo(newPost.getId());
         assertThat(newPost.getContent()).isEqualTo(createPost.getContent());
@@ -232,7 +236,7 @@ class PostServiceImpTest extends IntegrationSuite {
         Post postSecond = givenPostSecond();
         Post newPostSecond = postService.createPost(postSecond, file, securityUser);
 
-        Pageable pageable = new PageDto().getPageable(new PageDto());
+        Pageable pageable = new PageDtoPost().getPageable(new PageDtoPost());
 
         List<Post> posts = List.of(newPost, newPostFirst, newPostSecond);
 
@@ -265,7 +269,7 @@ class PostServiceImpTest extends IntegrationSuite {
         SecurityUser securityUserPerson = givenSecurityUser(person);
         postService.createPost(postSecond, file, securityUserPerson);
 
-        Pageable pageable = new PageDto().getPageable(new PageDto());
+        Pageable pageable = new PageDtoPost().getPageable(new PageDtoPost());
 
         SecurityUser securityUser = givenSecurityUser(user);
         List<Post> posts = List.of(newPost, newPostFirst);

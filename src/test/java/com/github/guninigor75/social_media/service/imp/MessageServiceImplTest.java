@@ -2,7 +2,7 @@ package com.github.guninigor75.social_media.service.imp;
 
 import com.github.guninigor75.social_media.config.IntegrationSuite;
 import com.github.guninigor75.social_media.config.ServiceConfiguration;
-import com.github.guninigor75.social_media.dto.activity.PageDto;
+import com.github.guninigor75.social_media.dto.activity.PageDtoPost;
 import com.github.guninigor75.social_media.entity.activity.Message;
 import com.github.guninigor75.social_media.entity.user.User;
 import com.github.guninigor75.social_media.repository.MessageRepository;
@@ -97,7 +97,7 @@ class MessageServiceImplTest extends IntegrationSuite {
         Message messageFirst = messageService.createMessage(userId, friendFirstId, new Message("Message 1"));
         Message messageSecond = messageService.createMessage(userId, friendFirstId, new Message("Message 2"));
         Message messageThree = messageService.createMessage(friendFirstId, friendSecondId, new Message("Message 3"));
-        Pageable pageable = new PageDto().getPageable(new PageDto());
+        Pageable pageable = new PageDtoPost().getPageable(new PageDtoPost());
 
         List<Message> messages = messageService.getMessages(userId, pageable);
         assertThat(messages.size()).isEqualTo(2);
@@ -127,7 +127,7 @@ class MessageServiceImplTest extends IntegrationSuite {
         Message messageSecond = messageService.createMessage(userId, friendFirstId, new Message("Message 2"));
         Message messageThree = messageService.createMessage(friendFirstId, friendSecondId, new Message("Message 3"));
         Message messageFour = messageService.createMessage(userId, friendSecondId, new Message("Message 3"));
-        Pageable pageable = new PageDto().getPageable(new PageDto());
+        Pageable pageable = new PageDtoPost().getPageable(new PageDtoPost());
 
         List<Message> messages = messageService.getMessagesUser(userId, friendFirstId, pageable);
         assertThat(messages.size()).isEqualTo(2);

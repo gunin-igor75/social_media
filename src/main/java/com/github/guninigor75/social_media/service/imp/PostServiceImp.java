@@ -74,13 +74,16 @@ public class PostServiceImp implements PostService {
 
     @Override
     @Transactional
-    public Post updatePost(CreatePost createPost) {
-        Post post = getPostById(createPost.getId());
-        if (createPost.getTitle() != null) {
-            post.setTitle(createPost.getTitle());
+    public Post updatePost(Post postUpdate) {
+        Post post = getPostById(postUpdate.getId());
+        if (postUpdate.getTitle() != null) {
+            post.setTitle(postUpdate.getTitle());
         }
-        if (createPost.getContent() != null) {
-            post.setContent(createPost.getContent());
+        if (postUpdate.getContent() != null) {
+            post.setContent(postUpdate.getContent());
+        }
+        if (postUpdate.getTitle() == null && postUpdate.getContent() == null) {
+            return post;
         }
         return postRepository.save(post);
     }

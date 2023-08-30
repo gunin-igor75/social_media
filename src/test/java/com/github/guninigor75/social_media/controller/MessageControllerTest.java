@@ -145,7 +145,8 @@ class MessageControllerTest extends IntegrationSuite {
 
         mvc.perform(MockMvcRequestBuilders
                         .get("/api/v1/messages")
-                        .header("Authorization", TOKEN_PREFIX + " " + token))
+                        .header("Authorization", TOKEN_PREFIX + " " + token)
+                        .param("sort", "DESC"))
                 .andDo(print())
                 .andExpect(content().json(objectMapper.writeValueAsString(messageDtos)))
                 .andExpect(status().is(200));

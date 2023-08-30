@@ -1,5 +1,6 @@
 package com.github.guninigor75.social_media.service.imp;
 
+import com.github.guninigor75.social_media.dto.user.UpdateUser;
 import com.github.guninigor75.social_media.entity.user.Invite;
 import com.github.guninigor75.social_media.entity.user.Role;
 import com.github.guninigor75.social_media.entity.user.User;
@@ -62,6 +63,21 @@ public class UserServiceImp implements UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         Role role = roleService.getRoleByName("ROLE_USER");
         user.addRole(role);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User updateUser(Long userId, UpdateUser updateUser) {
+        User user = getUserById(userId);
+        if (updateUser.getName() != null) {
+            user.setName(updateUser.getName());
+        }
+        if (updateUser.getPassword() != null) {
+            user.setPassword(passwordEncoder.encode(updateUser.getPassword()));
+        }
+        if (updateUser.getName() == null && updateUser.getPassword() == null) {
+            return user;
+        }
         return userRepository.save(user);
     }
 

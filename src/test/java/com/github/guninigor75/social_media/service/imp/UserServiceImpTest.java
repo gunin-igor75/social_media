@@ -2,6 +2,7 @@ package com.github.guninigor75.social_media.service.imp;
 
 import com.github.guninigor75.social_media.config.ServiceConfiguration;
 import com.github.guninigor75.social_media.config.IntegrationSuite;
+import com.github.guninigor75.social_media.dto.user.UpdateUser;
 import com.github.guninigor75.social_media.entity.user.Invite;
 import com.github.guninigor75.social_media.entity.user.Role;
 import com.github.guninigor75.social_media.entity.user.User;
@@ -71,6 +72,18 @@ class UserServiceImpTest extends IntegrationSuite {
         User saveUser = userRepository.save(user);
         User actualeUser = userService.getUserById(saveUser.getId());
         assertThat(saveUser).isEqualTo(actualeUser);
+    }
+
+    @Test
+    void updateUserPositiveTest() {
+        User user = userService.createUser(givenUser());
+        UpdateUser updateUser = givenUpdateUser();
+        Long userId = user.getId();
+        User newuser = userService.updateUser(userId, updateUser);
+
+        assertThat(newuser.getId()).isEqualTo(user.getId());
+        assertThat(newuser.getName()).isEqualTo(updateUser.getName());
+        assertThat(newuser.getPassword()).isNotEqualTo(user.getPassword());
     }
 
     @Test
@@ -221,7 +234,7 @@ class UserServiceImpTest extends IntegrationSuite {
                 .isInstanceOf(IllegalStateException.class);
     }
 
-    private static User givenUser() {
+    private  User givenUser() {
         User user = new User();
         user.setName("user");
         user.setUsername("user@gmail.ru");
@@ -229,13 +242,21 @@ class UserServiceImpTest extends IntegrationSuite {
         return user;
     }
 
-    private static User givenFriend() {
+    private  User givenFriend() {
         User user = new User();
         user.setName("friend");
         user.setUsername("friend@gmail.ru");
         user.setPassword("100");
         return user;
     }
+
+    private UpdateUser givenUpdateUser() {
+        UpdateUser updateUser = new UpdateUser();
+        updateUser.setName("New name");
+        updateUser.setPassword("New password");
+        return updateUser;
+    }
+
 }
 
 

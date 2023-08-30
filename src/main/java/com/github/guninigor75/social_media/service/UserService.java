@@ -1,5 +1,6 @@
 package com.github.guninigor75.social_media.service;
 
+import com.github.guninigor75.social_media.dto.user.UpdateUser;
 import com.github.guninigor75.social_media.entity.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +13,8 @@ public interface UserService {
     User getByUsername(String username);
 
     User createUser(User user);
+
+    User updateUser(Long userId, UpdateUser updateUser);
 
     User getLinkUser(Long id);
 

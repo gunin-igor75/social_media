@@ -15,7 +15,7 @@ public interface PostService {
 
     Post updatePictureByPostId(Long id, MultipartFile file);
 
-    Post updatePost(CreatePost createPost);
+    Post updatePost(Post post);
 
     List<Post> getPosts(Pageable pageable);
 

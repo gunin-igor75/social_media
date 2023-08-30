@@ -1,6 +1,7 @@
 package com.github.guninigor75.social_media.config;
 
 
+import com.github.guninigor75.social_media.mapper.PostMapper;
 import com.github.guninigor75.social_media.mapper.UserMapper;
 import com.github.guninigor75.social_media.repository.*;
 import com.github.guninigor75.social_media.security.JwtTokenProvider;
@@ -101,5 +102,9 @@ public class ServiceConfiguration {
         return new PostServiceImp(postRepository,userServiceTest(),pictureServiceTest());
     }
 
+    @Bean
+    public PostMapper postMapperTest() {
+        return Mappers.getMapper(PostMapper.class);
+    }
 
 }
